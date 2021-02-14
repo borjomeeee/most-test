@@ -1,16 +1,14 @@
 type Dogs = { [key: string]: string[] };
 export type DogType = string;
 
-export interface IDogBase {
+export interface IDogBreed {
   type: DogType;
   subType?: DogType;
 
   name: string;
-
-  imgPath?: string;
 }
 
-export interface IDog extends IDogBase {
+export interface IDog {
   id: string;
   imagePath: string;
 }
@@ -21,7 +19,7 @@ export class Dog {
     return [image, dir].join('_');
   }
 
-  static getDogFromBaseWithImage(dog: IDogBase, img: string): IDog {
+  static getDogFromBreedWithImage(dog: IDogBreed, img: string): IDog {
     const id = this.getIdFromUrl(img);
     return {
       id,
@@ -32,9 +30,9 @@ export class Dog {
   }
 }
 
-export const getDogTypes = (dogs: Dogs): IDogBase[] => {
+export const getDogTypes = (dogs: Dogs): IDogBreed[] => {
   return Object.keys(dogs)
-    .map((dogType: DogType): IDogBase | IDogBase[] => {
+    .map((dogType: DogType): IDogBreed | IDogBreed[] => {
       if (!Array.isArray(dogs[dogType]) || dogs[dogType].length === 0)
         return { type: dogType, name: dogType };
       else

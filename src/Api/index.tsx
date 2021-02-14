@@ -6,21 +6,15 @@ const makeRequest = async (url: string) => {
 };
 
 //get request returns all breeds and sub-breeds
-export const getAllBreeds = () => {
-  const url = 'https://dog.ceo/api/breeds/list/all';
-
-  //send request
-};
-
-export const getAllBreedTypes = async () => {
+export const getAllBreeds = async () => {
   const url = 'https://dog.ceo/api/breeds/list/all';
 
   const {data} = await makeRequest(url)
   return getDogTypes(data.message)
 };
 
-export const getImages = (breedName: string) => {
+export const getImages = async (breedName: string) => {
   const url = `https://dog.ceo/api/breed/${breedName}/images`;
-
-  //send request
+  const {data} = await makeRequest(url)
+  return data.message
 };
