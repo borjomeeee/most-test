@@ -1,9 +1,9 @@
 type Dogs = { [key: string]: string[] };
-export type DogType = string;
+export type DogBreed = string;
 
 export interface IDogBreed {
-  type: DogType;
-  subType?: DogType;
+  type: DogBreed;
+  subType?: DogBreed;
 
   name: string;
 }
@@ -30,16 +30,19 @@ export class Dog {
   }
 }
 
-export const getDogTypes = (dogs: Dogs): IDogBreed[] => {
+export const getDogBreeds = (dogs: Dogs): IDogBreed[] => {
   return Object.keys(dogs)
-    .map((dogType: DogType): IDogBreed | IDogBreed[] => {
+    .map((dogType: DogBreed, _: number): IDogBreed | IDogBreed[] => {
       if (!Array.isArray(dogs[dogType]) || dogs[dogType].length === 0)
         return { type: dogType, name: dogType };
       else
-        return dogs[dogType].map((type) => {
-          const name = `${dogType} (${type})`;
-          return { type: dogType, subType: type, name: name };
-        });
+        return [
+          { type: dogType, name: dogType },
+          ...dogs[dogType].map((type) => {
+            const name = `${dogType} (${type})`;
+            return { type: dogType, subType: type, name: name };
+          }),
+        ];
     })
     .flat();
 };

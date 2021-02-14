@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import * as RN from 'react-native';
 
-import { Image } from 'react-native-expo-image-cache';
 import RNPickerSelect from 'react-native-picker-select';
 
 import { getAllBreeds, getImages } from '../Api';
@@ -12,18 +11,21 @@ import List from '../Components/List';
 import { useDebounce } from '../Hooks/useDebounce';
 import { Dog, IDog, IDogBreed } from '../Utils';
 
+const renderCard = ({ item }: { item: any }) => <Card dog={item} />;
+
+type DogTypeList = { label: string; value: IDogBreed }[];
 const Main = () => {
+  const navigation = useNavigation();
+
   const [numToShow, setNumToShow] = React.useState(12);
-  const [dogTypes, setDogTypes] = React.useState<
-    { label: string; value: IDogBreed }[]
-  >([]);
+
+  const [dogs, setDogs] = React.useState<IDog[]>([]);
+  const [dogTypes, setDogTypes] = React.useState<DogTypeList>([]);
+
   const [selectedDogType, setSelectedDogType] = React.useState<
     undefined | IDogBreed
   >(undefined);
   const depouncedDogType = useDebounce(selectedDogType, 500);
-
-  const [dogs, setDogs] = React.useState<IDog[]>([]);
-  const navigation = useNavigation();
 
   React.useEffect(() => {
     const loadDogTypes = async () => {
@@ -33,14 +35,14 @@ const Main = () => {
     loadDogTypes();
   }, []);
 
-  const loadMore = () => {
+  const loadMore = React.useCallback(() => {
     setNumToShow((num) => num + 12);
-  };
+  }, [setNumToShow]);
 
-  const handleSelectBreed = (type: IDogBreed) => {
+  const handleSelectBreed = React.useCallback((type: IDogBreed) => {
     setNumToShow(12);
     setSelectedDogType(type);
-  };
+  }, []);
 
   React.useEffect(() => {
     const loadDogs = async () => {
@@ -62,28 +64,32 @@ const Main = () => {
     navigation.navigate('Избранное');
   }, [navigation]);
 
+  const Header = React.useMemo(
+    () => (
+      <>
+        <RNPickerSelect
+          items={dogTypes}
+          onValueChange={handleSelectBreed}
+          style={{
+            inputIOSContainer: s.picker,
+            inputAndroidContainer: s.picker,
+          }}
+          useNativeAndroidPickerStyle={false}
+        />
+        <Button text="В избранное" onClick={handlePressToFavorites} />
+      </>
+    ),
+    [dogTypes, handleSelectBreed, handlePressToFavorites]
+  );
+
   return (
     <List
       data={dogs.slice(0, numToShow)}
-      ListHeaderComponent={
-        <>
-          <RNPickerSelect
-            items={dogTypes}
-            onValueChange={handleSelectBreed}
-            style={{
-              inputIOSContainer: s.picker,
-              inputAndroidContainer: s.picker,
-            }}
-            useNativeAndroidPickerStyle={false}
-          />
-          <Button text="В избранное" onClick={handlePressToFavorites} />
-        </>
-      }
+      ListHeaderComponent={Header}
       stickyHeaderIndices={[0]}
-      keyExtractor={(item) => (item as IDog).id}
       onEndReachedThreshold={0.7}
       onEndReached={loadMore}
-      renderItem={({ item }) => <Card dog={item as IDog} />}
+      renderItem={renderCard}
     />
   );
 };

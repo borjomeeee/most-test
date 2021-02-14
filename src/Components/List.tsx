@@ -8,6 +8,7 @@ const getItemLayout = (_: any, index: number) => ({
   offset: IMAGE_SIZE * index,
   index,
 });
+const keyExtractor = (item: any) => item.id;
 
 interface IListProps extends React.ComponentProps<typeof RN.FlatList> {}
 const List: React.FC<IListProps> = ({ ...props }) => {
@@ -16,6 +17,7 @@ const List: React.FC<IListProps> = ({ ...props }) => {
       {...props}
       numColumns={3}
       getItemLayout={getItemLayout}
+      keyExtractor={keyExtractor}
       maxToRenderPerBatch={12}
       initialNumToRender={12}
     />
