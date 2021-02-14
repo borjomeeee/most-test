@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import * as RN from 'react-native';
 
@@ -5,19 +6,11 @@ import { Image } from 'react-native-expo-image-cache';
 import RNPickerSelect from 'react-native-picker-select';
 
 import { getAllBreeds, getImages } from '../Api';
+import Button from '../Components/Button';
+import Card from '../Components/Card';
+import List from '../Components/List';
 import { useDebounce } from '../Hooks/useDebounce';
 import { Dog, IDog, IDogBreed } from '../Utils';
-
-const IMAGE_SIZE = RN.Dimensions.get('window').width / 3;
-
-const renderItem = ({ item }: { item: IDog }) => (
-  <RN.View style={{ flex: 1 }}>
-    <Image
-      style={{ width: IMAGE_SIZE, height: IMAGE_SIZE }}
-      uri={item.imagePath}
-    />
-  </RN.View>
-);
 
 const Main = () => {
   const [numToShow, setNumToShow] = React.useState(12);
@@ -30,6 +23,7 @@ const Main = () => {
   const depouncedDogType = useDebounce(selectedDogType, 500);
 
   const [dogs, setDogs] = React.useState<IDog[]>([]);
+  const navigation = useNavigation();
 
   React.useEffect(() => {
     const loadDogTypes = async () => {
@@ -61,15 +55,16 @@ const Main = () => {
       );
     };
 
-    console.log(depouncedDogType)
     depouncedDogType && loadDogs();
   }, [depouncedDogType]);
 
+  const handlePressToFavorites = React.useCallback(() => {
+    navigation.navigate('Избранное');
+  }, [navigation]);
+
   return (
-    <RN.FlatList
+    <List
       data={dogs.slice(0, numToShow)}
-      numColumns={3}
-      stickyHeaderIndices={[0]}
       ListHeaderComponent={
         <>
           <RNPickerSelect
@@ -81,20 +76,14 @@ const Main = () => {
             }}
             useNativeAndroidPickerStyle={false}
           />
+          <Button text="В избранное" onClick={handlePressToFavorites} />
         </>
       }
-      style={{ flex: 1 }}
-      keyExtractor={(item) => item.id}
-      getItemLayout={(data, index) => ({
-        length: IMAGE_SIZE,
-        offset: IMAGE_SIZE * index,
-        index,
-      })}
-      maxToRenderPerBatch={12}
-      initialNumToRender={12}
+      stickyHeaderIndices={[0]}
+      keyExtractor={(item) => (item as IDog).id}
       onEndReachedThreshold={0.7}
       onEndReached={loadMore}
-      renderItem={renderItem}
+      renderItem={({ item }) => <Card dog={item as IDog} />}
     />
   );
 };
