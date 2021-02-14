@@ -66,7 +66,10 @@ const Main = () => {
 
   const Header = React.useMemo(
     () => (
-      <>
+      <RN.View style={s.header}>
+        <RN.Text style={s.hint}>* Для добавления в избранное удерживайте карточку</RN.Text>
+
+        <RN.Text style={s.titleSelect}>Порода:</RN.Text>
         <RNPickerSelect
           items={dogTypes}
           onValueChange={handleSelectBreed}
@@ -77,7 +80,7 @@ const Main = () => {
           useNativeAndroidPickerStyle={false}
         />
         <Button text="В избранное" onClick={handlePressToFavorites} />
-      </>
+      </RN.View>
     ),
     [dogTypes, handleSelectBreed, handlePressToFavorites]
   );
@@ -95,10 +98,25 @@ const Main = () => {
 };
 
 const s = RN.StyleSheet.create({
+  header: {
+    backgroundColor: '#fff',
+  },
   picker: {
     padding: 10,
 
+    borderTopWidth: 1,
+    borderTopColor: '#c4c4c4',
     backgroundColor: '#fff',
+  },
+
+  titleSelect: {
+    paddingVertical: 5,
+    fontWeight: 'bold'
+  },
+
+  hint: {
+    paddingVertical: 10,
+    paddingHorizontal: 20
   },
 });
 
